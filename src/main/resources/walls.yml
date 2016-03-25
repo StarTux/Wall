@@ -1,0 +1,30 @@
+help:
+  Permission: ''
+  lines:
+  - ''
+  - '&3&lWinthier Help'
+  - - '&3Servers: '
+    - button:
+        Text: '&r[&3Winthier&r]'
+        Command: /server winthier
+        Tooltip: Go to the surival server.
+    - ' '
+    - button:
+        Text: '&r[&3Creative&r]'
+        Command: /server creative
+        Tooltip: |-
+          &a/server creative
+          &oCommand
+          Go to the creative server.
+  - More to come
+  - ''
+world-main:
+  lines:
+  - ''
+  - This is the main world
+  - ''
+world-nether:
+  lines:
+  - ''
+  - This is the nether
+  - ''

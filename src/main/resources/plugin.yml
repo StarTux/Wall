@@ -1,0 +1,26 @@
+name: Wall
+description: Display walls of text to players
+author: StarTux
+version: 0.1
+main: com.winthier.wall.WallPlugin
+depend: []
+commands:
+  wall:
+    description: Display a wall of text
+    usage: /<command> <page>
+    permission: wall.wall
+  help:
+    aliases: ['?']
+    description: Display the help page
+    usage: /<command>
+    permission: wall.help
+permissions:
+  wall.wall:
+    description: Use the /wall command
+    default: op
+  wall.help:
+    description: Use /wall help
+    default: true
+  wall.reload:
+    description: Use /wall reload
+    default: op

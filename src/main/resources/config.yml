@@ -1,0 +1,4 @@
+JoinWall: help
+WorldWalls:
+  world: world-main
+  world_nether: world-nether
