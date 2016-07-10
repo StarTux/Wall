@@ -21,6 +21,6 @@ permissions:
   wall.help:
     description: Use /wall help
     default: true
-  wall.reload:
-    description: Use /wall reload
+  wall.admin:
+    description: Use admin commands
     default: op

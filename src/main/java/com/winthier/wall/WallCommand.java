@@ -15,14 +15,24 @@ class WallCommand implements CommandExecutor
         final Player player = sender instanceof Player ? (Player)sender : null;
         String firstArg = args[0];
         if (firstArg.startsWith("-")) {
+            if (!sender.hasPermission("wall.admin")) {
+                sender.sendMessage(ChatColor.RED + "No permission");
+                return true;
+            }
             firstArg = firstArg.substring(1);
             if (firstArg.equals("reload")) {
-                if (!sender.hasPermission("wall.reload")) {
-                    sender.sendMessage(ChatColor.RED + "No permission");
+                WallPlugin.getInstance().loadConfiguration();
+                WallPlugin.getInstance().loadWalls();
+                WallPlugin.getInstance().warps = null;
+                sender.sendMessage("Walls reloaded");
+            } else if (firstArg.equals("setwarp") && args.length == 2) {
+                if (player == null) {
+                    sender.sendMessage("Player expected");
                 } else {
-                    WallPlugin.getInstance().loadConfiguration();
-                    WallPlugin.getInstance().loadWalls();
-                    sender.sendMessage("Walls reloaded");
+                    String warpName = args[1].toLowerCase();
+                    WallPlugin.getInstance().getWarps().put(warpName, player.getLocation());
+                    WallPlugin.getInstance().saveWarps();
+                    sender.sendMessage("Warp created: " + warpName);
                 }
             }
         } else if (args.length == 1) {
