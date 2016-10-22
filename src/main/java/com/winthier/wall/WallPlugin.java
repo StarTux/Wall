@@ -17,7 +17,7 @@ public class WallPlugin extends JavaPlugin
     final Map<String, Wall> walls = new HashMap<>();
     final Map<String, String> worldWalls = new HashMap<>();
     String joinWall = null;
-    Map<String, Location> warps = null;
+    Map<String, Warp> warps = null;
     Map<String, String> aliases = null;
     
     @Override
@@ -53,15 +53,13 @@ public class WallPlugin extends JavaPlugin
         }
     }
 
-    Map<String, Location> getWarps() {
+    Map<String, Warp> getWarps() {
         if (warps == null) {
             YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "warps.yml"));
-            Map<String, Location> warps = new HashMap<>();
+            Map<String, Warp> warps = new HashMap<>();
             for (String key: config.getKeys(false)) {
-                Object  v = config.get(key);
-                if (v instanceof Location) {
-                    warps.put(key, (Location)v);
-                }
+                Warp warp = Warp.deserialize(config.getConfigurationSection(key));
+                warps.put(key, warp);
             }
             this.warps = warps;
         }
@@ -71,8 +69,9 @@ public class WallPlugin extends JavaPlugin
     void saveWarps() {
         if (walls == null) return;
         YamlConfiguration config = new YamlConfiguration();
-        for (Map.Entry<String, Location> entry: warps.entrySet()) {
-            config.set(entry.getKey(), entry.getValue());
+        for (Map.Entry<String, Warp> entry: warps.entrySet()) {
+            ConfigurationSection section = config.createSection(entry.getKey());
+            entry.getValue().serialize(section);
         }
         try {
             config.save(new File(getDataFolder(), "warps.yml"));

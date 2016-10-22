@@ -30,7 +30,7 @@ class WallCommand implements CommandExecutor
                     sender.sendMessage("Player expected");
                 } else {
                     String warpName = args[1].toLowerCase();
-                    WallPlugin.getInstance().getWarps().put(warpName, player.getLocation());
+                    WallPlugin.getInstance().getWarps().put(warpName, Warp.of(player.getLocation()));
                     WallPlugin.getInstance().saveWarps();
                     sender.sendMessage("Warp created: " + warpName);
                 }

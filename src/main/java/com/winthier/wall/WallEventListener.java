@@ -1,6 +1,7 @@
 package com.winthier.wall;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -33,10 +34,18 @@ class WallEventListener implements Listener {
     void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
         String cmd = event.getMessage().toLowerCase();
         if (cmd.startsWith("/")) cmd = cmd.substring(1);
-        Location loc = WallPlugin.getInstance().getWarps().get(cmd);
-        if (loc == null) return;
+        Warp warp = WallPlugin.getInstance().getWarps().get(cmd);
+        if (warp == null) return;
+        Player player = event.getPlayer();
+        String perm = warp.getPermission();
+        if (perm != null && !perm.isEmpty() && !player.hasPermission(perm)) return;
         event.setCancelled(true);
-        event.getPlayer().teleport(loc);
-        WallPlugin.getInstance().getLogger().info("Sent " + event.getPlayer().getName() + " to warp " + cmd);
+        Location loc = warp.getLocation();
+        if (loc == null) {
+            WallPlugin.getInstance().getLogger().warning("Warp '" + cmd + "' has invalid world: '" + warp.getWorld() + "'");
+            return;
+        }
+        player.teleport(loc);
+        WallPlugin.getInstance().getLogger().info("Sent " + player.getName() + " to warp " + cmd);
     }
 }
