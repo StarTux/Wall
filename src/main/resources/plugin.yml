@@ -2,6 +2,8 @@ name: Wall
 description: Display walls of text to players
 author: StarTux
 version: 0.1
+api-version: 1.13
+website: https://cavetale.com
 main: com.winthier.wall.WallPlugin
 depend: []
 commands:

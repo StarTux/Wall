@@ -11,7 +11,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Getter
-public class WallPlugin extends JavaPlugin
+public final class WallPlugin extends JavaPlugin
 {
     @Getter static WallPlugin instance;
     final Map<String, Wall> walls = new HashMap<>();
@@ -19,7 +19,7 @@ public class WallPlugin extends JavaPlugin
     String joinWall = null;
     Map<String, Warp> warps = null;
     Map<String, String> aliases = null;
-    
+
     @Override
     public void onEnable()
     {
