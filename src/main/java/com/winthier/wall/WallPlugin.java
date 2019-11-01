@@ -25,7 +25,6 @@ public final class WallPlugin extends JavaPlugin
     {
         instance = this;
         getCommand("wall").setExecutor(new WallCommand());
-        getCommand("help").setExecutor(new HelpCommand());
         getServer().getPluginManager().registerEvents(new WallEventListener(), this);
         saveResource("walls.yml", false);
         saveDefaultConfig();

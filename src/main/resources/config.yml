@@ -1,4 +1,4 @@
-JoinWall: help
+JoinWall: motd
 WorldWalls:
   world: world-main
   world_nether: world-nether

@@ -1,12 +1,12 @@
-help:
+motd:
   Permission: ''
   lines:
   - ''
-  - '&3&lWinthier Help'
+  - 'Welcome to Cavetale!'
   - - '&3Servers: '
     - button:
-        Text: '&r[&3Winthier&r]'
-        Command: /server winthier
+        Text: '&r[&Cavetale&r]'
+        Command: /server cavetale
         Tooltip: Go to the surival server.
     - ' '
     - button:
