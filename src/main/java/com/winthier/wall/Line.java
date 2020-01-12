@@ -1,5 +1,6 @@
 package com.winthier.wall;
 
+import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,14 +10,13 @@ import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.entity.Player;
-import org.json.simple.JSONValue;
 
 abstract class Line {
     abstract void send(Player player);
 
     static Line of(Object o) {
         if (o instanceof String) {
-            final String string = ChatColor.translateAlternateColorCodes('&', (String)o);
+            final String string = ChatColor.translateAlternateColorCodes('&', (String) o);
             return new Line() {
                 @Override void send(Player player) {
                     player.sendMessage(string);
@@ -24,11 +24,11 @@ abstract class Line {
             };
         }
         if (o instanceof List) {
-            @SuppressWarnings("unchecked") final List<?> list = (List<?>)o;
+            @SuppressWarnings("unchecked") final List<?> list = (List<?>) o;
             return new AdvancedLine(list);
         }
         if (o instanceof Map) {
-            @SuppressWarnings("unchecked") final Map<?, ?> map = (Map<?, ?>)o;
+            @SuppressWarnings("unchecked") final Map<?, ?> map = (Map<?, ?>) o;
             if (map.containsKey("Command")) {
                 final String command = map.get("Command").toString();
                 return new Line() {
@@ -45,13 +45,13 @@ abstract class Line {
 class AdvancedLine extends Line {
     final String json;
 
-    AdvancedLine(List<?> list) {
-        List<Object> json = new ArrayList<>();
-        for (Object o: list) {
+    AdvancedLine(final List<?> ls) {
+        List<Object> list = new ArrayList<>();
+        for (Object o: ls) {
             Object comp = component(o);
-            if (comp != null) json.add(comp);
+            if (comp != null) list.add(comp);
         }
-        this.json = JSONValue.toJSONString(json);
+        json = new Gson().toJson(list);
     }
 
     static String formatted(Object o) {
@@ -64,16 +64,9 @@ class AdvancedLine extends Line {
             result.put("text", formatted(o));
             return result;
         } else if (o instanceof Map) {
-            @SuppressWarnings("unchecked") final Map<?, ?> map = (Map<?, ?>)o;
+            @SuppressWarnings("unchecked") final Map<?, ?> map = (Map<?, ?>) o;
             ConfigurationSection config = new MemoryConfiguration().createSection("tmp", map);
-            return componentOfConfig(config);
-        }
-        return null;
-    }
-
-    static Object componentOfConfig(ConfigurationSection config) {
-        if (config.isConfigurationSection("button")) {
-            return buttonOfConfig(config.getConfigurationSection("button"));
+            return buttonOfConfig(config);
         }
         return null;
     }
@@ -97,7 +90,9 @@ class AdvancedLine extends Line {
         } else {
             hasClickEvent = false;
         }
-        if (hasClickEvent) { result.put("clickEvent", clickEvent); }
+        if (hasClickEvent) {
+            result.put("clickEvent", clickEvent);
+        }
         // Tooltip
         if (config.isSet("Tooltip")) {
             Map<String, Object> hoverEvent = new HashMap<>();

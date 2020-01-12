@@ -12,8 +12,9 @@ class Wall {
     final String name;
     final String permission;
     final List<Line> lines = new ArrayList<>();
+    final String command;
 
-    Wall(ConfigurationSection config) {
+    Wall(final ConfigurationSection config) {
         this.name = config.getName();
         this.permission = config.getString("Permission", null);
         for (Object o: config.getList("lines")) {
@@ -22,6 +23,7 @@ class Wall {
                 lines.add(line);
             }
         }
+        command = config.getString("Command");
     }
 
     void send(Player player) {
@@ -31,6 +33,7 @@ class Wall {
     }
 
     boolean hasPermission(CommandSender sender) {
-        return permission == null || sender.hasPermission(permission);
+        return permission == null || permission.isEmpty()
+            || sender.hasPermission(permission);
     }
 }
