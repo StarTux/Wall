@@ -75,6 +75,10 @@ class AdvancedLine extends Line {
         // Text
         Map<String, Object> result = new HashMap<>();
         result.put("text", formatted(config.getString("Text", "")));
+        String color = config.getString("Color");
+        if (color != null) result.put("color", color);
+        String font = config.getString("Font");
+        if (font != null) result.put("font", font);
         // Command or Suggestion
         Map<String, Object> clickEvent = new HashMap<>();
         boolean hasClickEvent = true;
