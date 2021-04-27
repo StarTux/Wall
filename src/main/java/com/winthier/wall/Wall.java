@@ -3,33 +3,33 @@ package com.winthier.wall;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
 
 @Getter
 class Wall {
     final String name;
     final String permission;
-    final List<Line> lines = new ArrayList<>();
     final String command;
+    final Component component;
 
     Wall(final ConfigurationSection config) {
         this.name = config.getName();
         this.permission = config.getString("Permission", null);
+        final List<Component> lines = new ArrayList<>();
         for (Object o: config.getList("lines")) {
             final Line line = Line.of(o);
             if (line != null) {
-                lines.add(line);
+                lines.add(line.toComponent());
             }
         }
+        component = Component.join(Component.newline(), lines);
         command = config.getString("Command");
     }
 
-    void send(Player player) {
-        for (Line line: lines) {
-            line.send(player);
-        }
+    void send(CommandSender sender) {
+        sender.sendMessage(component);
     }
 
     boolean hasPermission(CommandSender sender) {

@@ -1,25 +1,31 @@
 package com.winthier.wall;
 
-import com.google.gson.Gson;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.bukkit.Bukkit;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.MemoryConfiguration;
-import org.bukkit.entity.Player;
 
-abstract class Line {
-    abstract void send(Player player);
+public interface Line {
+    Component toComponent();
+
+    static String formatted(String string) {
+        return ChatColor.translateAlternateColorCodes('&', string);
+    }
 
     static Line of(Object o) {
         if (o instanceof String) {
-            final String string = ChatColor.translateAlternateColorCodes('&', (String) o);
+            final Component component = Component.text(formatted((String) o));
             return new Line() {
-                @Override void send(Player player) {
-                    player.sendMessage(string);
+                @Override
+                public Component toComponent() {
+                    return component;
                 }
             };
         }
@@ -27,90 +33,91 @@ abstract class Line {
             @SuppressWarnings("unchecked") final List<?> list = (List<?>) o;
             return new AdvancedLine(list);
         }
-        if (o instanceof Map) {
-            @SuppressWarnings("unchecked") final Map<?, ?> map = (Map<?, ?>) o;
-            if (map.containsKey("Command")) {
-                final String command = map.get("Command").toString();
-                return new Line() {
-                    @Override void send(Player player) {
-                        player.performCommand(command);
-                    }
-                };
-            }
-        }
         return null;
     }
 }
 
-class AdvancedLine extends Line {
-    final String json;
+final class AdvancedLine implements Line {
+    private final Component component;
+
+    @Override
+    public Component toComponent() {
+        return component;
+    }
 
     AdvancedLine(final List<?> ls) {
-        List<Object> list = new ArrayList<>();
-        for (Object o: ls) {
-            Object comp = component(o);
-            if (comp != null) list.add(comp);
+        Component[] list = new Component[ls.size()];
+        for (int i = 0; i < list.length; i += 1) {
+            list[i] = component(ls.get(i));
         }
-        json = new Gson().toJson(list);
+        component = TextComponent.ofChildren(list);
     }
 
-    static String formatted(Object o) {
-        return ChatColor.translateAlternateColorCodes('&', o.toString());
-    }
-
-    static Object component(Object o) {
+    static Component component(Object o) {
         if (o instanceof String) {
-            Map<String, String> result = new HashMap<>();
-            result.put("text", formatted(o));
-            return result;
+            return Component.text(Line.formatted((String) o));
         } else if (o instanceof Map) {
-            @SuppressWarnings("unchecked") final Map<?, ?> map = (Map<?, ?>) o;
-            ConfigurationSection config = new MemoryConfiguration().createSection("tmp", map);
-            return buttonOfConfig(config);
+            @SuppressWarnings("unchecked")
+            final Map<?, ?> map = (Map<?, ?>) o;
+            return configComponent(map);
+        } else if (o instanceof List) {
+            @SuppressWarnings("unchecked")
+            final List<?> list = (List<?>) o;
+            Component[] array = new Component[list.size()];
+            for (int i = 0; i < array.length; i += 1) {
+                array[i] = component(list.get(i));
+            }
+            return TextComponent.ofChildren(array);
         }
-        return null;
+        return Component.empty();
     }
 
-    static Object buttonOfConfig(ConfigurationSection config) {
-        // Text
-        Map<String, Object> result = new HashMap<>();
-        result.put("text", formatted(config.getString("Text", "")));
-        String color = config.getString("Color");
-        if (color != null) result.put("color", color);
-        String font = config.getString("Font");
-        if (font != null) result.put("font", font);
-        // Command or Suggestion
-        Map<String, Object> clickEvent = new HashMap<>();
-        boolean hasClickEvent = true;
-        if (config.isSet("Suggestion")) {
-            clickEvent.put("action", "suggest_command");
-            clickEvent.put("value", config.getString("Suggestion"));
-        } else if (config.isSet("URL")) {
-            clickEvent.put("action", "open_url");
-            clickEvent.put("value", config.getString("URL"));
-        } else if (config.isSet("Command")) {
-            clickEvent.put("action", "run_command");
-            clickEvent.put("value", config.getString("Command", "/help"));
+    static TextColor color(String in) {
+        if (in == null) {
+            return null;
+        } else if (in.startsWith("#")) {
+            try {
+                return TextColor.fromHexString(in);
+            } catch (IllegalArgumentException iae) {
+                return null;
+            }
         } else {
-            hasClickEvent = false;
+            return NamedTextColor.NAMES.value(in);
         }
-        if (hasClickEvent) {
-            result.put("clickEvent", clickEvent);
-        }
-        // Tooltip
-        if (config.isSet("Tooltip")) {
-            Map<String, Object> hoverEvent = new HashMap<>();
-            result.put("hoverEvent", hoverEvent);
-            hoverEvent.put("action", "show_text");
-            final String value;
-            value = formatted(config.getString("Tooltip"));
-            hoverEvent.put("value", value);
-        }
-        return result;
     }
 
-    @Override void send(Player player) {
-        String command = "tellraw " + player.getName() + " " + json;
-        Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
+    private static Component configComponent(Map<?, ?> config) {
+        TextComponent.Builder cb = Component.text();
+        if (config.containsKey("Text")) {
+            cb.content(Line.formatted(config.get("Text").toString()));
+        }
+        if (config.containsKey("Color")) {
+            TextColor color = color(config.get("Color").toString());
+            if (color != null) cb.color(color);
+        }
+        for (TextDecoration decoration : TextDecoration.values()) {
+            String key = decoration.name().substring(0, 1)
+                + decoration.name().substring(1).toLowerCase();
+            if (config.containsKey(key)) {
+                Object v = config.get(key);
+                if (v instanceof Boolean) {
+                    cb.decoration(decoration, (Boolean) v);
+                }
+            }
+        }
+        if (config.containsKey("Font")) {
+            cb.font(Key.key(config.get("Font").toString()));
+        }
+        if (config.containsKey("Suggestion")) {
+            cb.clickEvent(ClickEvent.suggestCommand(config.get("Suggestion").toString()));
+        } else if (config.containsKey("URL")) {
+            cb.clickEvent(ClickEvent.openUrl(config.get("URL").toString()));
+        } else if (config.containsKey("Command")) {
+            cb.clickEvent(ClickEvent.runCommand(config.get("Command").toString()));
+        }
+        if (config.containsKey("Tooltip")) {
+            cb.hoverEvent(HoverEvent.showText(component((Object) config.get("Tooltip"))));
+        }
+        return cb.build();
     }
 }

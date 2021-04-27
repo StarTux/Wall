@@ -31,12 +31,10 @@ class WallCommand implements CommandExecutor {
             Wall wall = plugin.getWalls().get(firstArg);
             if (wall == null) {
                 sender.sendMessage(ChatColor.RED + "Not found: " + firstArg);
-            } else if (player == null) {
-                sender.sendMessage(ChatColor.RED + "Player expected");
             } else if (!wall.hasPermission(sender)) {
                 sender.sendMessage(ChatColor.RED + "No permission");
             } else {
-                wall.send(player);
+                wall.send(sender);
             }
         } else {
             return false;
