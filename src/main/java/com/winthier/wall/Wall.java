@@ -1,5 +1,7 @@
 package com.winthier.wall;
 
+import com.cavetale.core.font.Emoji;
+import com.cavetale.core.font.GlyphPolicy;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
@@ -29,7 +31,7 @@ class Wall {
     }
 
     void send(CommandSender sender) {
-        sender.sendMessage(component);
+        sender.sendMessage(Emoji.replaceText(component, GlyphPolicy.HIDDEN));
     }
 
     boolean hasPermission(CommandSender sender) {
