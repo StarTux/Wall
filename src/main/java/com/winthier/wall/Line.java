@@ -95,10 +95,11 @@ final class AdvancedLine implements Line {
             Component component = Component.text(Line.formatted(config.get("Text").toString()));
             component = Emoji.replaceText(component, GlyphPolicy.HIDDEN);
             List<Component> children = component.children();
-            for (Component child : children) {
-                child.hoverEvent(null);
+            for (int i = 0; i < children.size(); i += 1) {
+                children.set(i, children.get(i).hoverEvent(null));
             }
-            component.children(children);
+            component = component.children(children);
+            component = component.hoverEvent(null);
             cb.append(component);
         }
         if (config.containsKey("Color")) {
