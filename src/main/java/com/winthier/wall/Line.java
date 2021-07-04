@@ -2,6 +2,7 @@ package com.winthier.wall;
 
 import com.cavetale.core.font.Emoji;
 import com.cavetale.core.font.GlyphPolicy;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import net.kyori.adventure.key.Key;
@@ -94,7 +95,7 @@ final class AdvancedLine implements Line {
         if (config.containsKey("Text")) {
             Component component = Component.text(Line.formatted(config.get("Text").toString()));
             component = Emoji.replaceText(component, GlyphPolicy.HIDDEN);
-            List<Component> children = component.children();
+            List<Component> children = new ArrayList<>(component.children());
             for (int i = 0; i < children.size(); i += 1) {
                 children.set(i, children.get(i).hoverEvent(null));
             }
