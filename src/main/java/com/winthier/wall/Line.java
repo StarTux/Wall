@@ -2,7 +2,6 @@ package com.winthier.wall;
 
 import com.cavetale.core.font.Emoji;
 import com.cavetale.core.font.GlyphPolicy;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import net.kyori.adventure.key.Key;
@@ -25,7 +24,7 @@ public interface Line {
     static Line of(Object o) {
         if (o instanceof String) {
             Component component = Component.text(formatted((String) o));
-            Component component2 = Emoji.replaceText(component, GlyphPolicy.HIDDEN);
+            Component component2 = Emoji.replaceText(component, GlyphPolicy.HIDDEN, false);
             return new Line() {
                 @Override
                 public Component toComponent() {
@@ -94,13 +93,7 @@ final class AdvancedLine implements Line {
         TextComponent.Builder cb = Component.text();
         if (config.containsKey("Text")) {
             Component component = Component.text(Line.formatted(config.get("Text").toString()));
-            component = Emoji.replaceText(component, GlyphPolicy.HIDDEN);
-            List<Component> children = new ArrayList<>(component.children());
-            for (int i = 0; i < children.size(); i += 1) {
-                children.set(i, children.get(i).hoverEvent(null));
-            }
-            component = component.children(children);
-            component = component.hoverEvent(null);
+            component = Emoji.replaceText(component, GlyphPolicy.HIDDEN, false);
             cb.append(component);
         }
         if (config.containsKey("Color")) {
