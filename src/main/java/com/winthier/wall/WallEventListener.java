@@ -6,14 +6,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 
 @RequiredArgsConstructor
 class WallEventListener implements Listener {
     final WallPlugin plugin;
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    void onPlayerJoin(PlayerJoinEvent event) {
+    void onPlayerResourcePackStatus(PlayerResourcePackStatusEvent event) {
+        if (event.getStatus() != PlayerResourcePackStatusEvent.Status.SUCCESSFULLY_LOADED) return;
         final String key = plugin.getJoinWall();
         if (key == null) return;
         final Wall wall = plugin.getWalls().get(key);
