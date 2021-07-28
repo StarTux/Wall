@@ -6,6 +6,7 @@ api-version: 1.13
 website: https://cavetale.com
 main: com.winthier.wall.WallPlugin
 depend: [Core]
+softdepend: [Mytems]
 commands:
   wall:
     description: Display a wall of text
