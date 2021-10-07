@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.JoinConfiguration;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -24,7 +25,7 @@ class Wall {
                 lines.add(line.toComponent());
             }
         }
-        component = Component.join(Component.newline(), lines);
+        component = Component.join(JoinConfiguration.separator(Component.newline()), lines);
         command = config.getString("Command");
     }
 

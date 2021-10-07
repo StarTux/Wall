@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -53,7 +54,7 @@ final class AdvancedLine implements Line {
         for (int i = 0; i < list.length; i += 1) {
             list[i] = component(ls.get(i));
         }
-        component = TextComponent.ofChildren(list);
+        component = Component.join(JoinConfiguration.noSeparators(), list);
     }
 
     static Component component(Object o) {
@@ -70,7 +71,7 @@ final class AdvancedLine implements Line {
             for (int i = 0; i < array.length; i += 1) {
                 array[i] = component(list.get(i));
             }
-            return TextComponent.ofChildren(array);
+            return Component.join(JoinConfiguration.noSeparators(), array);
         }
         return Component.empty();
     }
