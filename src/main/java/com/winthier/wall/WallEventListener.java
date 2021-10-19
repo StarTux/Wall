@@ -1,5 +1,7 @@
 package com.winthier.wall;
 
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,8 +17,9 @@ class WallEventListener implements Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     void onPlayerResourcePackStatus(PlayerResourcePackStatusEvent event) {
         if (event.getStatus() != PlayerResourcePackStatusEvent.Status.SUCCESSFULLY_LOADED) return;
-        final String key = plugin.getJoinWall();
-        if (key == null) return;
+        final List<String> list = plugin.getJoinWalls();
+        if (list == null || list.isEmpty()) return;
+        String key = list.get(ThreadLocalRandom.current().nextInt(list.size()));
         final Wall wall = plugin.getWalls().get(key);
         if (wall == null) return;
         if (!wall.hasPermission(event.getPlayer())) return;

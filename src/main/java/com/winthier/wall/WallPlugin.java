@@ -2,6 +2,7 @@ package com.winthier.wall;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
@@ -12,7 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class WallPlugin extends JavaPlugin {
     final Map<String, Wall> walls = new HashMap<>();
     final Map<String, Wall> commands = new HashMap<>();
-    String joinWall = null;
+    List<String> joinWalls = null;
 
     @Override
     public void onEnable() {
@@ -40,6 +41,13 @@ public final class WallPlugin extends JavaPlugin {
     void loadConfiguration() {
         reloadConfig();
         final ConfigurationSection config = getConfig();
-        joinWall = config.getString("JoinWall");
+        joinWalls = config.getStringList("JoinWalls");
+        if (joinWalls == null) {
+            String joinWall = config.getString("JoinWall");
+            joinWalls = joinWall != null
+                ? List.of(joinWall)
+                : List.of();
+        }
+        getLogger().info("Join Walls: " + joinWalls);
     }
 }
