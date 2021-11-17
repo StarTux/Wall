@@ -18,7 +18,9 @@ public final class WallPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
-        saveResource("walls.yml", false);
+        if (!new File(getDataFolder(), "walls.yml").exists()) {
+            saveResource("walls.yml", false);
+        }
         reloadConfig();
         getCommand("wall").setExecutor(new WallCommand(this));
         getServer().getPluginManager().registerEvents(new WallEventListener(this), this);
