@@ -46,11 +46,14 @@ public final class WallPlugin extends JavaPlugin {
     protected void loadWalls(File file) {
         if (!file.isFile()) return;
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+        int wallCount = 0;
         for (String key: config.getKeys(false)) {
             Wall wall = new Wall(config.getConfigurationSection(key));
             walls.put(key, wall);
+            wallCount += 1;
             if (wall.command != null) commands.put(wall.command, wall);
         }
+        getLogger().info("Loaded " + wallCount + " walls from file " + file);
     }
 
     protected void loadConfiguration() {
