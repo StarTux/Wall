@@ -28,11 +28,24 @@ public final class WallPlugin extends JavaPlugin {
         loadWalls();
     }
 
-    void loadWalls() {
+    protected void loadWalls() {
         walls.clear();
         commands.clear();
-        YamlConfiguration config = YamlConfiguration
-            .loadConfiguration(new File(getDataFolder(), "walls.yml"));
+        loadWalls(new File(getDataFolder(), "walls.yml"));
+        loadWallFolder(new File(getDataFolder(), "walls"));
+        loadWallFolder(new File("/home/mc/public/Wall/walls"));
+    }
+
+    protected void loadWallFolder(File folder) {
+        if (!folder.isDirectory()) return;
+        for (File file : folder.listFiles()) {
+            loadWalls(file);
+        }
+    }
+
+    protected void loadWalls(File file) {
+        if (!file.isFile()) return;
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
         for (String key: config.getKeys(false)) {
             Wall wall = new Wall(config.getConfigurationSection(key));
             walls.put(key, wall);
@@ -40,7 +53,7 @@ public final class WallPlugin extends JavaPlugin {
         }
     }
 
-    void loadConfiguration() {
+    protected void loadConfiguration() {
         reloadConfig();
         final ConfigurationSection config = getConfig();
         joinWalls = config.getStringList("JoinWalls");
