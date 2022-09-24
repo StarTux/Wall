@@ -18,6 +18,11 @@ commands:
     usage: /<command> <page>
     permission: wall.wall
 
+  discord:
+    description: Discord link
+    usage: /discord
+    permission: wall.discord
+
 permissions:
 
   wall.wall:
@@ -26,4 +31,8 @@ permissions:
 
   wall.admin:
     description: Use admin commands
+    default: op
+
+  wall.discord:
+    description: Use /discord
     default: op
