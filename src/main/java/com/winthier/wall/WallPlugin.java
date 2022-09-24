@@ -33,7 +33,7 @@ public final class WallPlugin extends JavaPlugin {
         commands.clear();
         loadWalls(new File(getDataFolder(), "walls.yml"));
         loadWallFolder(new File(getDataFolder(), "walls"));
-        loadWallFolder(new File("/home/mc/public/Wall/walls"));
+        loadWallFolder(new File("/home/mc/public/config/Wall/walls"));
     }
 
     protected void loadWallFolder(File folder) {
