@@ -51,7 +51,9 @@ public final class WallPlugin extends JavaPlugin {
             Wall wall = new Wall(config.getConfigurationSection(key));
             walls.put(key, wall);
             wallCount += 1;
-            if (wall.command != null) commands.put(wall.command, wall);
+            if (wall.getCommand() != null) {
+                commands.put(wall.getCommand(), wall);
+            }
         }
         getLogger().info("Loaded " + wallCount + " walls from file " + file);
     }

@@ -4,36 +4,56 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.JoinConfiguration;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
+import static net.kyori.adventure.text.Component.join;
+import static net.kyori.adventure.text.Component.newline;
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.JoinConfiguration.separator;
 
 @Getter
-class Wall {
-    final String name;
-    final String permission;
-    final String command;
-    final Component component;
+public final class Wall {
+    private final String name;
+    private final String permission;
+    private final String command;
+    private final boolean book;
+    private final List<Component> lines = new ArrayList<>();
 
-    Wall(final ConfigurationSection config) {
+    public Wall(final ConfigurationSection config) {
         this.name = config.getName();
         this.permission = config.getString("Permission", null);
-        final List<Component> lines = new ArrayList<>();
         for (Object o: config.getList("lines")) {
             final Line line = Line.of(o);
             if (line != null) {
                 lines.add(line.toComponent());
             }
         }
-        component = Component.join(JoinConfiguration.separator(Component.newline()), lines);
-        command = config.getString("Command");
+        this.command = config.getString("Command");
+        this.book = config.getBoolean("Book");
     }
 
-    void send(CommandSender sender) {
+    public void send(CommandSender sender) {
+        Component component = join(separator(newline()), lines);
+        if (book && sender instanceof Player player) {
+            ItemStack bookItem = new ItemStack(Material.WRITTEN_BOOK);
+            bookItem.editMeta(m -> {
+                    if (m instanceof BookMeta meta) {
+                        meta.pages(List.of(component));
+                        meta.author(text("Cavetale"));
+                        meta.title(text("Wall"));
+                    }
+                });
+            player.openBook(bookItem);
+            return;
+        }
         sender.sendMessage(component);
     }
 
-    boolean hasPermission(CommandSender sender) {
+    public boolean hasPermission(CommandSender sender) {
         return permission == null || permission.isEmpty()
             || sender.hasPermission(permission);
     }
